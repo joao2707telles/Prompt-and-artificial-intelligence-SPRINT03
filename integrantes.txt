@@ -1,0 +1,34 @@
+
+EV Challenge — GoodWe
+Sprint 03 — Agentes de IA e Evolução Conversacional
+Disciplina: Prompt and Artificial Intelligence
+
+Integrante 1
+Nome: Guilherme Figueira Velloso
+RM: 568827
+Turma: 1CCA
+
+Integrante 2
+Nome: José Augusto Ribeiro Freire Manfrinato
+RM: 571151
+Turma: 1CCA
+
+Integrante 3
+Nome: Lais da Silva Dias
+RM: 569943
+Turma: 1CCA
+
+Integrante 4
+Nome: João Augusto Poloniato Telles
+RM: 571443
+Turma: 1CCA
+
+Integrante 5
+Nome: Thiago Soalheiro Diamantino
+RM: 569316
+Turma: 1CCA
+
+Integrante 6
+Nome: Kauan Damasceno de Lima
+RM: 573727
+Turma: 1CCA
