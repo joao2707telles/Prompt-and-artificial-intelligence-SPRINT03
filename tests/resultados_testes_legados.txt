@@ -1,0 +1,70 @@
+
+============================================================
+SPRINT 1
+============================================================
+
+Usuário: gostaria de carregar o meu byd dolphin mini
+GoodWezinho: Olá! O BYD Dolphin Mini possui uma bateria de 38 kWh. 
+
+Usando um carregador GoodWe da linha HCA G2 de 22 kW, o tempo estimado para uma carga completa é de aproximadamente 1 hora e 48 minutos. O custo estimado para essa carga completa é de R$ 19,00.
+
+Posso ajudar com mais alguma informação sobre os nossos carregadores ou locais de recarga?
+Tempo: 1.59s
+
+============================================================
+SPRINT 2
+============================================================
+
+Usuário: tenho um byd seal e quero colocar um carregador na minha casa
+GoodWezinho: Olá! Sou o GoodWezinho, o assistente da GoodWe. 
+
+O BYD Seal possui uma bateria de aproximadamente **82,5 kWh**. 
+
+Como você deseja instalar um carregador residencial, posso ajudar com a nossa linha **HCA G2**, que é compatível com todas as marcas de carros elétricos e possui modelos monofásicos (7 kW) e trifásicos (11 kW e 22 kW). 
+
+Para o BYD Seal, o modelo ideal é o **HCA GW 22K** (trifásico de 22 kW), que custa **R$ 7.775,00**. 
+
+Com esse carregador de 22 kW, uma carga completa da bateria do seu Seal levará cerca de **3 horas e 45 minutos**.
+
+Deseja prosseguir com o atendimento comercial para a compra ou tem alguma dúvida sobre a instalação ou as especificações técnicas da linha HCA G2?
+Tempo: 1.52s
+
+Usuário: qual é a mais rapida?
+GoodWezinho: Para o BYD Seal (bateria de ~82,5 kWh), a opção mais rápida da linha HCA G2 é o **HCA GW 22K** (carregador trifásico de 22 kW), que realiza a carga completa em aproximadamente **3 horas e 45 minutos**. 
+
+Vale lembrar que a velocidade final de recarga também depende da capacidade máxima que o carregador interno do seu veículo suporta receber em corrente alternada (AC). 
+
+O HCA GW 22K está disponível por **R$ 7.775,00**. Posso ajudar com mais informações ou com o processo de aquisição?
+Tempo: 1.10s
+
+Usuário: gostaria de mais informacoes dele
+GoodWezinho: O **HCA GW 22K** é um carregador veicular trifásico de 22 kW da linha HCA G2 da GoodWe. Aqui estão as principais informações técnicas e recursos dele, com base no nosso datasheet:
+
+- **Modos de operação:** Carregamento rápido, Prioridade para Solar, FV + BAT e Agendamento de carregamento (gerenciados pelo aplicativo SEMS+ da GoodWe).
+- **Métodos de partida:** Aplicativo, RFID (acompanha 2 cartões) ou Início Automático.
+- **Conectividade:** Bluetooth, Wi-Fi, LAN, RS485 (×2) e suporte a Modbus TCP.
+- **Segurança e Proteção:** Grau de proteção IP66 (ideal para instalação em áreas internas ou externas), DPS Tipo III integrado, interruptor externo para desligamento de emergência. *(Nota: É necessário um RCD tipo A externo).*
+- **Instalação:** Pode ser fixado na parede ou no piso (utilizando um suporte opcional).
+- **Dimensões e Peso:** 208 × 450 × 170 mm. O peso varia de acordo com o cabo (cabo de 6 metros ou 7,5 metros opcional).
+- **Ruído:** Extremamente silencioso (<20 dB).
+
+O valor deste modelo é **R$ 7.775,00**. 
+
+Como a instalação será na sua casa, lembro que recomendamos que o serviço seja avaliado e realizado por um profissional habilitado, devido às normas de segurança elétrica. Deseja seguir com a compra?
+Tempo: 1.99s
+
+Usuário: estou em pinheiros, onde é o carregador mais perto?
+GoodWezinho: Como você está no bairro de Pinheiros (São Paulo), o local com carregadores da nossa rede mais próximo de você é o **Shopping Vila Olímpia**, que fica logo ao lado!
+
+Os shoppings disponíveis no nosso projeto são:
+- Shopping Vila Olímpia
+- JK Iguatemi
+- Shopping Cidade Jardim
+- MorumbiShopping
+- Shopping Ibirapuera
+- Shopping SP Market
+- Shopping Interlagos
+- Shopping Iguatemi São Paulo
+
+Posso ajudar com mais alguma informação sobre a nossa rede de carregadores ou sobre a compra do seu HCA G2?
+Tempo: 1.17s
