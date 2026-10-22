@@ -7,33 +7,33 @@ from pathlib import Path
 from langchain_core.messages import HumanMessage
 
 
-# Permite importar os arquivos da raiz do projeto
-PASTA_ATUAL = Path(__file__).resolve().parent
-RAIZ_PROJETO = PASTA_ATUAL.parent
+# Pastas do projeto
+PASTA_AVALIACAO = Path(__file__).resolve().parent
+RAIZ_PROJETO = PASTA_AVALIACAO.parent
 
 if str(RAIZ_PROJETO) not in sys.path:
     sys.path.insert(0, str(RAIZ_PROJETO))
 
 
 from agent import criar_agente, extrair_texto
-from evaluator import criar_juiz, avaliar_resposta
+from evaluator import criar_juiz, avaliar_lote
 
 
-ARQUIVO_DATASET = PASTA_ATUAL / "golden_dataset.json"
-
-ARQUIVO_RESULTADOS = (
-    PASTA_ATUAL / "resultados_detalhados.csv"
-)
-
-ARQUIVO_RESUMO = (
-    PASTA_ATUAL / "resumo_metricas.csv"
-)
+ARQUIVO_DATASET = PASTA_AVALIACAO / "golden_dataset.json"
+ARQUIVO_RESULTADOS = PASTA_AVALIACAO / "resultados_detalhados.csv"
+ARQUIVO_RESUMO = PASTA_AVALIACAO / "resumo_metricas.csv"
 
 
-# Mesmos dois modelos comparados na Sprint 3
-MODELOS = [
-    "gemini-3.5-flash",
-    "gemini-3.5-flash-lite"
+# Mantemos as mesmas versões usadas na Sprint 3.
+VERSOES = [
+    {
+        "nome": "Flash",
+        "modelo": "gemini-3.5-flash"
+    },
+    {
+        "nome": "Flash-Lite",
+        "modelo": "gemini-3.5-flash-lite"
+    }
 ]
 
 
@@ -46,30 +46,18 @@ def carregar_dataset():
         return json.load(arquivo)
 
 
-def obter_ultima_resposta(resultado):
-    mensagens = resultado["messages"]
-
-    ultima = mensagens[-1]
-
-    return extrair_texto(ultima)
+def pegar_resposta(resultado):
+    mensagem = resultado["messages"][-1]
+    return extrair_texto(mensagem)
 
 
-def executar_teste(
-    agente,
-    teste,
-    nome_modelo
-):
+def executar_teste(agente, teste, versao):
     """
-    Executa um teste do golden dataset.
-
-    Para testes de memória, mantém o mesmo thread_id
-    durante todos os turnos.
+    Executa um caso do golden dataset.
     """
 
     thread_id = (
-        f"sprint04_"
-        f"{nome_modelo.replace('/', '_')}_"
-        f"teste_{teste['id']}"
+        f"sprint04_{versao}_teste_{teste['id']}"
     )
 
     config = {
@@ -78,64 +66,94 @@ def executar_teste(
         }
     }
 
-    # Teste com vários turnos
+    # Caso com memória e vários turnos
     if "turnos" in teste:
-
         resultado = None
 
         for turno in teste["turnos"]:
-
             resultado = agente.invoke(
                 {
                     "messages": [
-                        HumanMessage(
-                            content=turno
-                        )
+                        HumanMessage(content=turno)
                     ]
                 },
                 config=config
             )
 
-        resposta = obter_ultima_resposta(
-            resultado
-        )
+            # Evita excesso de chamadas por minuto
+            time.sleep(13)
 
-        pergunta_avaliacao = (
+        resposta = pegar_resposta(resultado)
+
+        pergunta = (
             "Conversa em vários turnos:\n"
-            + "\n".join(
-                teste["turnos"]
-            )
+            + "\n".join(teste["turnos"])
         )
 
-        return (
-            pergunta_avaliacao,
-            resposta
-        )
+        return pergunta, resposta
 
-    # Teste normal
+    # Caso normal
     pergunta = teste["pergunta"]
 
     resultado = agente.invoke(
         {
             "messages": [
-                HumanMessage(
-                    content=pergunta
-                )
+                HumanMessage(content=pergunta)
             ]
         },
         config=config
     )
 
-    resposta = obter_ultima_resposta(
-        resultado
-    )
+    resposta = pegar_resposta(resultado)
 
     return pergunta, resposta
 
 
-def salvar_resultados(resultados):
+def executar_com_retry(
+    agente,
+    teste,
+    versao,
+    tentativas=3
+):
+    """
+    Faz novas tentativas em erros temporários da API.
+    """
 
+    for tentativa in range(1, tentativas + 1):
+        try:
+            return executar_teste(
+                agente,
+                teste,
+                versao
+            )
+
+        except Exception as erro:
+            texto_erro = str(erro)
+
+            temporario = (
+                "429" in texto_erro
+                or "503" in texto_erro
+                or "RESOURCE_EXHAUSTED" in texto_erro
+                or "UNAVAILABLE" in texto_erro
+            )
+
+            if not temporario:
+                raise
+
+            if tentativa == tentativas:
+                raise
+
+            print(
+                f"  Erro temporário. "
+                f"Tentativa {tentativa}/{tentativas}."
+            )
+
+            time.sleep(30)
+
+
+def salvar_resultados(resultados):
     campos = [
+        "versao",
         "modelo",
         "teste_id",
         "categoria",
@@ -165,27 +183,19 @@ def salvar_resultados(resultados):
         )
 
         writer.writeheader()
-
-        for linha in resultados:
-            writer.writerow(linha)
+        writer.writerows(resultados)
 
 
-def media_valida(
-    resultados,
-    modelo,
-    campo
-):
-
+def media(resultados, versao, campo):
     valores = []
 
     for linha in resultados:
-
-        if linha["modelo"] != modelo:
+        if linha["versao"] != versao:
             continue
 
         valor = linha.get(campo)
 
-        if valor is None or valor == "":
+        if valor in [None, ""]:
             continue
 
         try:
@@ -202,92 +212,72 @@ def media_valida(
     )
 
 
-def taxa_recusa(
-    resultados,
-    modelo
-):
-
+def taxa_recusa(resultados, versao):
     valores = []
 
     for linha in resultados:
-
-        if linha["modelo"] != modelo:
+        if linha["versao"] != versao:
             continue
 
-        valor = linha.get(
-            "recusa_correta"
-        )
+        valor = linha.get("recusa_correta")
 
-        if valor is None or valor == "":
+        if valor in [None, ""]:
             continue
 
-        try:
-            valores.append(int(valor))
-        except (ValueError, TypeError):
-            pass
+        valores.append(int(valor))
 
     if not valores:
         return None
 
     return round(
-        (
-            sum(valores)
-            / len(valores)
-        ) * 100,
+        (sum(valores) / len(valores)) * 100,
         2
     )
 
 
 def gerar_resumo(resultados):
-
     resumo = []
 
-    for modelo in MODELOS:
+    for versao in VERSOES:
+        nome = versao["nome"]
 
         linha = {
-            "modelo": modelo,
-            "correcao_media": media_valida(
+            "versao": nome,
+            "modelo": versao["modelo"],
+            "correcao_media": media(
                 resultados,
-                modelo,
+                nome,
                 "correcao"
             ),
-            "aderencia_escopo_media": media_valida(
+            "aderencia_escopo_media": media(
                 resultados,
-                modelo,
+                nome,
                 "aderencia_escopo"
             ),
-            "fidelidade_media": media_valida(
+            "fidelidade_media": media(
                 resultados,
-                modelo,
+                nome,
                 "fidelidade"
             ),
-            "seguranca_media": media_valida(
+            "seguranca_media": media(
                 resultados,
-                modelo,
+                nome,
                 "seguranca"
             ),
             "taxa_recusa_correta_percentual": taxa_recusa(
                 resultados,
-                modelo
+                nome
             ),
-            "score_final_medio": media_valida(
+            "score_final_medio": media(
                 resultados,
-                modelo,
+                nome,
                 "score_final"
             )
         }
 
         resumo.append(linha)
 
-    campos = [
-        "modelo",
-        "correcao_media",
-        "aderencia_escopo_media",
-        "fidelidade_media",
-        "seguranca_media",
-        "taxa_recusa_correta_percentual",
-        "score_final_medio"
-    ]
+    campos = list(resumo[0].keys())
 
     with open(
         ARQUIVO_RESUMO,
@@ -302,14 +292,12 @@ def gerar_resumo(resultados):
         )
 
         writer.writeheader()
-
         writer.writerows(resumo)
 
     return resumo
 
 
 def main():
-
     print(
         "\n=== SPRINT 04 - PIPELINE DE AVALIAÇÃO ===\n"
     )
@@ -321,30 +309,38 @@ def main():
         f"{len(dataset)} testes\n"
     )
 
-    juiz = criar_juiz(
-        "gemini-3.5-flash"
-    )
-
     resultados = []
 
-    for nome_modelo in MODELOS:
+    # Juiz separado das duas versões avaliadas
+    juiz = criar_juiz(
+        model_name="gemini-3.8-flash"
+    )
+
+    for versao in VERSOES:
+
+        nome = versao["nome"]
+        modelo = versao["modelo"]
 
         print(
             "\n----------------------------------------"
         )
-
         print(
-            f"AVALIANDO MODELO: {nome_modelo}"
+            f"AVALIANDO VERSÃO: {nome}"
         )
-
+        print(
+            f"MODELO: {modelo}"
+        )
         print(
             "----------------------------------------\n"
         )
 
         agente = criar_agente(
-            model_name=nome_modelo
+            model_name=modelo
         )
 
+        testes_para_juiz = []
+
+        # Primeiro o agente responde
         for teste in dataset:
 
             print(
@@ -353,85 +349,62 @@ def main():
             )
 
             try:
-
-                pergunta, resposta = executar_teste(
+                pergunta, resposta = executar_com_retry(
                     agente,
                     teste,
-                    nome_modelo
-                )
-
-                avaliacao = avaliar_resposta(
-                    juiz=juiz,
-                    pergunta=pergunta,
-                    resposta=resposta,
-                    criterio_aceite=teste[
-                        "criterio_aceite"
-                    ],
-                    categoria=teste[
-                        "categoria"
-                    ]
+                    nome
                 )
 
                 linha = {
-                    "modelo": nome_modelo,
+                    "versao": nome,
+                    "modelo": modelo,
                     "teste_id": teste["id"],
-                    "categoria": teste[
-                        "categoria"
-                    ],
+                    "categoria": teste["categoria"],
                     "pergunta": pergunta,
                     "criterio_aceite": teste[
                         "criterio_aceite"
                     ],
                     "resposta": resposta,
-                    "correcao": avaliacao.get(
-                        "correcao"
-                    ),
-                    "aderencia_escopo": avaliacao.get(
-                        "aderencia_escopo"
-                    ),
-                    "fidelidade": avaliacao.get(
-                        "fidelidade"
-                    ),
-                    "seguranca": avaliacao.get(
-                        "seguranca"
-                    ),
-                    "recusa_correta": avaliacao.get(
-                        "recusa_correta"
-                    ),
-                    "score_final": avaliacao.get(
-                        "score_final"
-                    ),
-                    "justificativa": avaliacao.get(
-                        "justificativa"
-                    ),
+                    "correcao": "",
+                    "aderencia_escopo": "",
+                    "fidelidade": "",
+                    "seguranca": "",
+                    "recusa_correta": "",
+                    "score_final": "",
+                    "justificativa": "",
                     "erro": ""
                 }
 
-                resultados.append(
-                    linha
+                resultados.append(linha)
+
+                testes_para_juiz.append(
+                    {
+                        "teste_id": teste["id"],
+                        "categoria": teste["categoria"],
+                        "pergunta": pergunta,
+                        "criterio_aceite": teste[
+                            "criterio_aceite"
+                        ],
+                        "resposta": resposta
+                    }
                 )
 
-                print(
-                    f"  Score: "
-                    f"{linha['score_final']}/5"
-                )
+                print("  Resposta obtida.")
 
             except Exception as erro:
-
                 print(
                     f"  ERRO: {erro}"
                 )
 
                 resultados.append(
                     {
-                        "modelo": nome_modelo,
+                        "versao": nome,
+                        "modelo": modelo,
                         "teste_id": teste["id"],
-                        "categoria": teste[
-                            "categoria"
-                        ],
+                        "categoria": teste["categoria"],
                         "pergunta": teste.get(
                             "pergunta",
-                            "Teste multi-turno"
+                            "Teste de memória"
                         ),
                         "criterio_aceite": teste[
                             "criterio_aceite"
@@ -448,27 +421,98 @@ def main():
                     }
                 )
 
-            # Salva mesmo se a execução parar depois
-            salvar_resultados(
-                resultados
-            )
+            # Salva as respostas mesmo antes do juiz
+            salvar_resultados(resultados)
 
-            # Pequena pausa para reduzir chance
-            # de limite da API
-            time.sleep(1)
+            time.sleep(13)
 
-    resumo = gerar_resumo(
-        resultados
-    )
+        print(
+            f"\nEnviando respostas da versão "
+            f"{nome} para o LLM Judge..."
+        )
+
+        # Uma única chamada do juiz para a versão inteira
+        if testes_para_juiz:
+            try:
+                avaliacoes = avaliar_lote(
+                    juiz,
+                    testes_para_juiz
+                )
+
+                avaliacoes_por_id = {
+                    int(item["teste_id"]): item
+                    for item in avaliacoes
+                }
+
+                for linha in resultados:
+                    if linha["versao"] != nome:
+                        continue
+
+                    avaliacao = avaliacoes_por_id.get(
+                        int(linha["teste_id"])
+                    )
+
+                    if not avaliacao:
+                        continue
+
+                    linha["correcao"] = avaliacao.get(
+                        "correcao",
+                        ""
+                    )
+
+                    linha[
+                        "aderencia_escopo"
+                    ] = avaliacao.get(
+                        "aderencia_escopo",
+                        ""
+                    )
+
+                    linha["fidelidade"] = avaliacao.get(
+                        "fidelidade",
+                        ""
+                    )
+
+                    linha["seguranca"] = avaliacao.get(
+                        "seguranca",
+                        ""
+                    )
+
+                    linha[
+                        "recusa_correta"
+                    ] = avaliacao.get(
+                        "recusa_correta",
+                        ""
+                    )
+
+                    linha["score_final"] = avaliacao.get(
+                        "score_final",
+                        ""
+                    )
+
+                    linha["justificativa"] = avaliacao.get(
+                        "justificativa",
+                        ""
+                    )
+
+                salvar_resultados(resultados)
+
+                print(
+                    "Avaliação automática concluída."
+                )
+
+            except Exception as erro:
+                print(
+                    f"Erro no LLM Judge: {erro}"
+                )
+
+    resumo = gerar_resumo(resultados)
 
     print(
         "\n========================================"
     )
-
     print(
         "RESULTADOS FINAIS"
     )
-
     print(
         "========================================\n"
     )
@@ -476,7 +520,7 @@ def main():
     for linha in resumo:
 
         print(
-            f"Modelo: {linha['modelo']}"
+            f"Versão: {linha['versao']}"
         )
 
         print(
@@ -505,7 +549,7 @@ def main():
         )
 
         print(
-            f"SCORE FINAL: "
+            f"Score final: "
             f"{linha['score_final_medio']}/5"
         )
 
@@ -515,13 +559,8 @@ def main():
         "Arquivos gerados:"
     )
 
-    print(
-        ARQUIVO_RESULTADOS
-    )
-
-    print(
-        ARQUIVO_RESUMO
-    )
+    print(ARQUIVO_RESULTADOS)
+    print(ARQUIVO_RESUMO)
 
 
 if __name__ == "__main__":
