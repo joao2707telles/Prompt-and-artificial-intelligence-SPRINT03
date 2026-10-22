@@ -124,6 +124,8 @@ registrados, sem perda relevante de qualidade.
 
 ## Estrutura principal
 
+## Estrutura principal
+
 ```text
 agent.py
 prompts.py
@@ -134,6 +136,8 @@ resultados_modelos.csv
 integrantes.txt
 requirements.txt
 tests/
+avaliacao/
+```
 
 ## Sprint 04 — Avaliação Sistemática do Agente
 
