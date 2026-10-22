@@ -135,20 +135,22 @@ Dessa forma, a escolha da melhor versão deixa de depender apenas de observaçã
 
 ### 10. Equipe e divisão de trabalho
 
+O grupo dividiu as entregas do projeto ao longo do semestre, de forma que cada integrante ficou responsável por desenvolver uma das etapas/sprints atribuídas a ele. Dessa forma, nem todos os integrantes participaram diretamente da implementação da Sprint 04.
+
 **Guilherme Figueira Velloso — RM 568827**  
-Participação na revisão do golden dataset e validação dos casos de teste.
+Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
 
 **José Augusto Ribeiro Freire Manfrinato — RM 571151**  
-Participação na revisão dos critérios de avaliação e organização dos resultados.
+Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
 
 **Lais da Silva Dias — RM 569943**  
-Participação na validação dos testes e revisão do relatório final.
+Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
 
 **João Augusto Poloniato Telles — RM 571443**  
-Implementação e integração do pipeline de avaliação e organização dos resultados.
+Responsável pela Sprint 04, incluindo a construção do golden dataset, implementação do pipeline de avaliação, configuração do LLM as a Judge, comparação entre as versões do agente, organização dos resultados e elaboração do relatório desta sprint.
 
 **Thiago Soalheiro Diamantino — RM 569316**  
-Participação na revisão dos testes e comparação entre as versões do agente.
+Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
 
 **Kauan Damasceno de Lima — RM 573727**  
-Participação na revisão da documentação e análise final dos resultados.
+Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
