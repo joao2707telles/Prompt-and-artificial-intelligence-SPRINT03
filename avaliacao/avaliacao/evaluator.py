@@ -128,9 +128,20 @@ Retorne APENAS JSON válido neste formato:
         [HumanMessage(content=prompt)]
     )
 
-    resultado = extrair_json(
-        resposta_juiz.content
-    )
+    conteudo = resposta_juiz.content
+
+    if isinstance(conteudo, list):
+        textos = []
+
+        for item in conteudo:
+            if isinstance(item, dict) and "text" in item:
+                textos.append(item["text"])
+            else:
+                textos.append(str(item))
+
+        conteudo = " ".join(textos)
+
+    resultado = extrair_json(conteudo)
 
     # Garantia de limites das notas
     for metrica in [
