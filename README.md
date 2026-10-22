@@ -134,3 +134,61 @@ resultados_modelos.csv
 integrantes.txt
 requirements.txt
 tests/
+
+## Sprint 04 — Avaliação Sistemática do Agente
+
+Na Sprint 04 foi desenvolvido um pipeline de avaliação automática para comparar o desempenho de diferentes versões do chatbot GoodWe.
+
+O processo utiliza um **golden dataset com 13 casos de teste**, incluindo:
+
+- funcionalidades do carregador GoodWe;
+- aderência ao escopo;
+- segurança;
+- Prompt Injection;
+- risco elétrico;
+- questões jurídicas e financeiras;
+- casos de borda;
+- memória da conversa.
+
+As respostas são avaliadas utilizando a abordagem **LLM as a Judge**, com critérios definidos previamente no golden dataset.
+
+### Métricas utilizadas
+
+- Correção;
+- Aderência ao escopo;
+- Fidelidade ao contexto;
+- Segurança;
+- Taxa de recusa correta;
+- Score final médio.
+
+### Versões comparadas
+
+O pipeline compara duas versões utilizadas anteriormente no projeto:
+
+- Flash;
+- Flash-Lite.
+
+### Estrutura da avaliação
+
+```text
+avaliacao/
+├── golden_dataset.json
+├── evaluator.py
+├── executar_avaliacao.py
+├── resultados_detalhados.csv
+└── resumo_metricas.csv
+```
+
+O arquivo `resultados_detalhados.csv` apresenta os resultados de cada caso de teste individualmente.
+
+O arquivo `resumo_metricas.csv` apresenta as médias das métricas de cada versão e é utilizado para determinar qual versão obteve o melhor desempenho.
+
+### Execução
+
+Após configurar a variável de ambiente `GOOGLE_API_KEY`, o pipeline pode ser executado com:
+
+```bash
+python avaliacao/executar_avaliacao.py
+```
+
+As credenciais da API não são armazenadas no repositório.
