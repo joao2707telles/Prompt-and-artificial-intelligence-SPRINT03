@@ -101,13 +101,22 @@ Além do score final, serão analisadas separadamente as métricas de correção
 
 ### 7. Comparação com a avaliação manual da Sprint 3
 
-Na Sprint 3, os modelos foram comparados manualmente através de testes de funcionamento, segurança e comportamento do agente.
+Na Sprint 3, a comparação entre os modelos foi realizada manualmente, considerando o comportamento do agente nos testes funcionais, de memória e de segurança.
 
-A Sprint 04 permite comparar essa análise manual com uma avaliação automática baseada em critérios iguais para todas as respostas.
+Naquela avaliação, os dois modelos apresentaram comportamento adequado. Porém, o Flash-Lite foi escolhido para a versão final do agente por apresentar menor latência média e menor quantidade de tokens registrados durante os testes.
 
-Após a execução do pipeline será possível verificar se o resultado automático confirma a conclusão obtida anteriormente ou se existem diferenças entre as duas formas de avaliação.
+Os resultados observados na Sprint 3 foram:
 
-**Resultado da comparação:** PREENCHER APÓS EXECUÇÃO.
+| Modelo | Latência média | Tokens registrados |
+|---|---:|---:|
+| Flash | 9,09 s | 9.771 |
+| Flash-Lite | 0,81 s | 7.275 |
+
+Na Sprint 04, a comparação deixa de considerar apenas essas observações e passa a utilizar também métricas automáticas de correção, aderência ao escopo, fidelidade, segurança e recusa correta.
+
+Após a execução completa do pipeline, os resultados automáticos serão comparados com a conclusão da Sprint 3 para verificar se o Flash-Lite continua sendo a melhor escolha quando a qualidade das respostas também é medida de forma sistemática.
+
+**Resultado da comparação automática:** PREENCHER APÓS EXECUÇÃO DO PIPELINE.
 
 ---
 
