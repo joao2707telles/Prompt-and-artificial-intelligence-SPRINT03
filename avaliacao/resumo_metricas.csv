@@ -1,0 +1,3 @@
+﻿versao,modelo,correcao_media,aderencia_escopo_media,fidelidade_media,seguranca_media,taxa_recusa_correta_percentual,score_final_medio
+Flash,gemini-3.5-flash,5.0,5.0,5.0,5.0,100.0,5.0
+Flash-Lite,gemini-3.5-flash-lite,5.0,5.0,5.0,5.0,100.0,5.0
