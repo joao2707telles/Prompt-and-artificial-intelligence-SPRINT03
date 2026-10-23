@@ -1,4 +1,5 @@
-# EV Challenge — GoodWe  
+# EV Challenge — GoodWe
+
 ## Sprint 04 — Avaliação Sistemática do Agente
 
 ### 1. Introdução
@@ -41,16 +42,20 @@ Foram avaliadas duas versões do agente utilizadas durante a Sprint 3:
 - Flash;
 - Flash-Lite.
 
-Para cada versão, o pipeline envia as perguntas ao agente e armazena suas respostas.
+Para cada versão, o pipeline envia as 13 perguntas do golden dataset ao agente e armazena as respostas produzidas.
 
-Depois, um segundo modelo é utilizado como **LLM as a Judge**, recebendo a pergunta, a resposta produzida pelo agente e o critério de aceite.
+Depois, um segundo modelo é utilizado como **LLM as a Judge**, recebendo as respostas do agente juntamente com as perguntas e os critérios de aceite.
 
-O juiz automático atribui notas para cada resposta e os resultados são armazenados em arquivos CSV.
+O juiz automático atribui notas para cada resposta de acordo com as métricas definidas no projeto.
 
-Os arquivos gerados pelo pipeline são:
+Para reduzir a quantidade de chamadas à API, as respostas de cada versão são avaliadas em lote pelo LLM juiz.
+
+Os resultados são armazenados nos seguintes arquivos:
 
 - `resultados_detalhados.csv`;
 - `resumo_metricas.csv`.
+
+O primeiro arquivo apresenta a avaliação individual de cada teste, enquanto o segundo apresenta as médias finais de cada versão.
 
 ---
 
@@ -74,28 +79,40 @@ Cada métrica principal recebe uma nota de 0 a 5. O score final é calculado uti
 
 ### 5. Resultados
 
-A tabela abaixo apresenta os resultados obtidos pelo pipeline.
+A execução final do pipeline avaliou 26 respostas no total, sendo 13 casos de teste para cada versão do agente.
 
-| Métrica | Flash | Flash-Lite |
+Nenhum erro foi registrado durante a execução final.
+
+Os resultados obtidos foram:
+
+| **Métrica** | **Flash** | **Flash-Lite** |
 |---|---:|---:|
-| Correção média | PREENCHER | PREENCHER |
-| Aderência ao escopo | PREENCHER | PREENCHER |
-| Fidelidade | PREENCHER | PREENCHER |
-| Segurança | PREENCHER | PREENCHER |
-| Taxa de recusa correta | PREENCHER | PREENCHER |
-| Score final | PREENCHER | PREENCHER |
+| Correção média | 5,0 | 5,0 |
+| Aderência ao escopo | 5,0 | 5,0 |
+| Fidelidade | 5,0 | 5,0 |
+| Segurança | 5,0 | 5,0 |
+| Taxa de recusa correta | 100% | 100% |
+| Score final | 5,0/5 | 5,0/5 |
 
-Os valores acima serão obtidos diretamente pelo arquivo `resumo_metricas.csv` gerado pelo pipeline.
+Os dois modelos atenderam completamente aos critérios definidos no golden dataset.
+
+Para os casos avaliados, não foi identificada diferença de qualidade entre as duas versões.
 
 ---
 
 ### 6. Classificação das versões
 
-Após a execução completa do pipeline, a versão com maior score final será considerada a versão com melhor desempenho geral.
+De acordo com as métricas automáticas da Sprint 04, houve um empate entre as versões Flash e Flash-Lite.
 
-Além do score final, serão analisadas separadamente as métricas de correção, fidelidade, segurança e aderência ao escopo para evitar que a decisão seja baseada em apenas um valor.
+As duas versões obtiveram score final de **5,0/5**, além de alcançarem nota máxima nas métricas de correção, aderência ao escopo, fidelidade e segurança.
 
-**Versão com melhor desempenho:** PREENCHER APÓS EXECUÇÃO.
+A taxa de recusa correta também foi de **100%** para os dois modelos.
+
+Portanto, considerando apenas a qualidade das respostas medida pelo pipeline da Sprint 04, nenhuma das duas versões apresentou desempenho superior.
+
+Porém, ao considerar também os resultados obtidos na Sprint 3, o **Flash-Lite permanece como a versão escolhida para o projeto**, pois apresentou menor latência e menor quantidade de tokens registrados, sem apresentar perda de qualidade na avaliação automática.
+
+**Classificação final:** empate em qualidade, com preferência pelo Flash-Lite devido à maior eficiência observada anteriormente.
 
 ---
 
@@ -107,28 +124,36 @@ Naquela avaliação, os dois modelos apresentaram comportamento adequado. Porém
 
 Os resultados observados na Sprint 3 foram:
 
-| Modelo | Latência média | Tokens registrados |
+| **Modelo** | **Latência média** | **Tokens registrados** |
 |---|---:|---:|
 | Flash | 9,09 s | 9.771 |
 | Flash-Lite | 0,81 s | 7.275 |
 
-Na Sprint 04, a comparação deixa de considerar apenas essas observações e passa a utilizar também métricas automáticas de correção, aderência ao escopo, fidelidade, segurança e recusa correta.
+Na Sprint 04, o pipeline automático apresentou nota máxima para os dois modelos em todas as métricas avaliadas.
 
-Após a execução completa do pipeline, os resultados automáticos serão comparados com a conclusão da Sprint 3 para verificar se o Flash-Lite continua sendo a melhor escolha quando a qualidade das respostas também é medida de forma sistemática.
+Dessa forma, o resultado automatizado concorda com a percepção da Sprint 3 de que os dois modelos apresentavam qualidade adequada nas respostas.
 
-**Resultado da comparação automática:** PREENCHER APÓS EXECUÇÃO DO PIPELINE.
+A principal diferença é que a Sprint 04 não encontrou vantagem de qualidade para nenhum dos dois modelos. O resultado foi um empate técnico.
+
+Por esse motivo, a escolha do Flash-Lite realizada anteriormente continua sendo considerada adequada, pois ele manteve a mesma qualidade do Flash no pipeline automatizado, enquanto já havia apresentado menor latência e menor utilização de tokens na avaliação anterior.
+
+Assim, a avaliação automática reforçou a conclusão da Sprint 3: o Flash-Lite apresenta um melhor equilíbrio entre qualidade e eficiência para o projeto.
 
 ---
 
 ### 8. Limitações
 
-Uma das limitações observadas foi o limite de requisições da API utilizada durante os testes.
+Uma das limitações observadas durante o desenvolvimento foi o limite de requisições da API utilizada nos testes.
 
-Como cada versão do agente precisa responder diversas perguntas e as respostas também precisam ser avaliadas pelo LLM juiz, o número de requisições pode aumentar rapidamente.
+Em uma primeira execução, parte dos testes não pôde ser concluída devido ao limite de requisições disponível. Por esse motivo, o pipeline foi ajustado para reduzir o número de chamadas ao LLM juiz e incluir intervalos entre as requisições.
 
-Outra limitação é que a avaliação utiliza um modelo de linguagem como juiz. Mesmo utilizando o mesmo critério para todas as respostas, ainda pode existir alguma variação ou interpretação diferente do modelo avaliador.
+Após o ajuste e a renovação da cota da API, a execução final foi concluída com os 26 testes e sem erros.
 
-Além disso, o golden dataset possui um número limitado de casos e não representa todas as perguntas possíveis que um usuário poderia fazer.
+Outra limitação é que a avaliação utiliza um modelo de linguagem como juiz. Mesmo utilizando os mesmos critérios para todas as respostas, ainda pode existir alguma variação na interpretação feita pelo modelo avaliador.
+
+Além disso, o golden dataset possui 13 casos de teste e, apesar de cobrir os principais fluxos do agente, não representa todas as perguntas possíveis que um usuário poderia realizar.
+
+Essas limitações devem ser consideradas ao interpretar os resultados obtidos.
 
 ---
 
@@ -136,15 +161,23 @@ Além disso, o golden dataset possui um número limitado de casos e não represe
 
 A Sprint 04 adicionou uma etapa de avaliação sistemática ao chatbot desenvolvido durante o semestre.
 
-O golden dataset e o pipeline permitem testar diferentes versões do agente utilizando os mesmos critérios e gerar métricas comparáveis automaticamente.
+Foi criado um golden dataset com 13 casos de teste e um pipeline capaz de executar automaticamente esses casos em duas versões do agente e avaliar as respostas utilizando LLM as a Judge.
 
-Dessa forma, a escolha da melhor versão deixa de depender apenas de observação manual e passa a ser apoiada também por resultados quantitativos.
+Ao todo, foram avaliadas 26 respostas sem erros na execução final.
+
+Tanto o Flash quanto o Flash-Lite obtiveram nota máxima em correção, aderência ao escopo, fidelidade e segurança, além de uma taxa de recusa correta de 100%.
+
+Os resultados mostraram que as duas versões apresentam a mesma qualidade nos casos avaliados pelo pipeline.
+
+Ao relacionar esses resultados com a avaliação manual da Sprint 3, o Flash-Lite continua sendo a versão mais adequada para o projeto, pois apresentou anteriormente menor latência e menor quantidade de tokens sem perda de qualidade.
+
+Com isso, a Sprint 04 permitiu confirmar de forma automática e quantitativa uma decisão que anteriormente havia sido baseada principalmente em testes manuais.
 
 ---
 
 ### 10. Equipe e divisão de trabalho
 
-O grupo dividiu as entregas do projeto ao longo do semestre, de forma que cada integrante ficou responsável por desenvolver uma das etapas/sprints atribuídas a ele. Dessa forma, nem todos os integrantes participaram diretamente da implementação da Sprint 04.
+O grupo dividiu as entregas do projeto ao longo do semestre, de forma que cada integrante ficou responsável por desenvolver uma das etapas ou sprints atribuídas a ele. Dessa forma, nem todos os integrantes participaram diretamente da implementação da Sprint 04.
 
 **Guilherme Figueira Velloso — RM 568827**  
 Responsável por uma das etapas anteriores do projeto EV Challenge — GoodWe.
