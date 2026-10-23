@@ -6,7 +6,7 @@
 
 A Sprint 04 tem como objetivo avaliar de forma automática o desempenho do chatbot desenvolvido nas sprints anteriores do projeto EV Challenge — GoodWe.
 
-Nas Sprints 1 e 2 foram definidos o problema, o contexto do chatbot, os testes iniciais e sua implementação. Na Sprint 3 o agente foi reorganizado utilizando LangGraph, memória por sessão, RAG e regras de segurança.
+Nas Sprints 1 e 2 foram definidos o problema, o contexto do chatbot, os testes iniciais e sua implementação. Na Sprint 3, o agente foi reorganizado utilizando LangGraph, memória por sessão, RAG e regras de segurança.
 
 Nesta sprint foi desenvolvido um pipeline de avaliação para substituir parte da análise manual realizada anteriormente por uma avaliação automática e reproduzível.
 
@@ -31,6 +31,8 @@ Cada teste possui uma pergunta e um critério de aceite que descreve o comportam
 
 Também foi incluído um teste de múltiplos turnos para verificar se a memória por sessão implementada na Sprint 3 continua funcionando corretamente.
 
+O golden dataset reaproveita ideias e comportamentos que já haviam sido testados nas sprints anteriores, mas agora esses testes são executados de forma automática e comparável.
+
 ---
 
 ### 3. Pipeline de avaliação
@@ -47,6 +49,8 @@ Para cada versão, o pipeline envia as 13 perguntas do golden dataset ao agente 
 Depois, um segundo modelo é utilizado como **LLM as a Judge**, recebendo as respostas do agente juntamente com as perguntas e os critérios de aceite.
 
 O juiz automático atribui notas para cada resposta de acordo com as métricas definidas no projeto.
+
+A abordagem LLM as a Judge foi escolhida porque permite avaliar respostas em linguagem natural utilizando os critérios definidos pelo próprio projeto. Além disso, ela se integra diretamente às ferramentas e à API que já eram utilizadas no chatbot nas sprints anteriores, sem necessidade de criar uma métrica diferente para cada tipo de pergunta.
 
 Para reduzir a quantidade de chamadas à API, as respostas de cada versão são avaliadas em lote pelo LLM juiz.
 
@@ -73,7 +77,11 @@ Foram utilizadas as seguintes métricas:
 
 **Taxa de recusa correta:** verifica se o agente recusou corretamente solicitações que deveriam ser bloqueadas.
 
-Cada métrica principal recebe uma nota de 0 a 5. O score final é calculado utilizando a média das métricas aplicáveis ao teste.
+Cada métrica principal recebe uma nota de 0 a 5.
+
+A taxa de recusa correta utiliza os valores 0 ou 1 nos testes em que uma recusa é esperada.
+
+O score final de cada teste é calculado utilizando a média das métricas aplicáveis àquele caso. Ao final, o pipeline calcula também a média geral de cada versão.
 
 ---
 
@@ -108,11 +116,15 @@ As duas versões obtiveram score final de **5,0/5**, além de alcançarem nota m
 
 A taxa de recusa correta também foi de **100%** para os dois modelos.
 
-Portanto, considerando apenas a qualidade das respostas medida pelo pipeline da Sprint 04, nenhuma das duas versões apresentou desempenho superior.
+Portanto, considerando exclusivamente as métricas de qualidade da Sprint 04, nenhuma das duas versões apresentou desempenho superior.
 
-Porém, ao considerar também os resultados obtidos na Sprint 3, o **Flash-Lite permanece como a versão escolhida para o projeto**, pois apresentou menor latência e menor quantidade de tokens registrados, sem apresentar perda de qualidade na avaliação automática.
+Porém, ao considerar a avaliação geral do projeto, o **Flash-Lite foi classificado como a melhor versão**.
 
-**Classificação final:** empate em qualidade, com preferência pelo Flash-Lite devido à maior eficiência observada anteriormente.
+Na Sprint 3, o Flash-Lite apresentou latência média de **0,81 s**, enquanto o Flash apresentou **9,09 s**. O Flash-Lite também registrou uma quantidade menor de tokens, com **7.275**, contra **9.771** do Flash.
+
+Como os dois modelos apresentaram a mesma qualidade no pipeline da Sprint 04, esses resultados de eficiência permitem escolher o Flash-Lite sem perda de qualidade.
+
+**Classificação final:** Flash-Lite, por apresentar o mesmo desempenho de qualidade do Flash e maior eficiência nos testes realizados anteriormente.
 
 ---
 
@@ -135,6 +147,8 @@ Dessa forma, o resultado automatizado concorda com a percepção da Sprint 3 de 
 
 A principal diferença é que a Sprint 04 não encontrou vantagem de qualidade para nenhum dos dois modelos. O resultado foi um empate técnico.
 
+Uma possível explicação para esse empate é o tamanho do golden dataset e o fato de os casos escolhidos representarem principalmente os comportamentos esperados do agente. Como as duas versões conseguiram atender corretamente aos 13 testes, ambas chegaram ao valor máximo das métricas utilizadas.
+
 Por esse motivo, a escolha do Flash-Lite realizada anteriormente continua sendo considerada adequada, pois ele manteve a mesma qualidade do Flash no pipeline automatizado, enquanto já havia apresentado menor latência e menor utilização de tokens na avaliação anterior.
 
 Assim, a avaliação automática reforçou a conclusão da Sprint 3: o Flash-Lite apresenta um melhor equilíbrio entre qualidade e eficiência para o projeto.
@@ -152,6 +166,8 @@ Após o ajuste e a renovação da cota da API, a execução final foi concluída
 Outra limitação é que a avaliação utiliza um modelo de linguagem como juiz. Mesmo utilizando os mesmos critérios para todas as respostas, ainda pode existir alguma variação na interpretação feita pelo modelo avaliador.
 
 Além disso, o golden dataset possui 13 casos de teste e, apesar de cobrir os principais fluxos do agente, não representa todas as perguntas possíveis que um usuário poderia realizar.
+
+O fato de os dois modelos terem alcançado nota máxima também indica que os critérios e o conjunto de testes podem não ser suficientes para separar modelos com desempenho muito próximo.
 
 Essas limitações devem ser consideradas ao interpretar os resultados obtidos.
 
